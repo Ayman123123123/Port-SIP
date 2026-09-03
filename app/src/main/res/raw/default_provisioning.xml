@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Port-SIP default provisioning XML.
+
+    This is an original, minimal provisioning payload that a real SIP engine could
+    use to bootstrap an account remotely. The bundled DemoCallEngine does not
+    consume it; it is provided so that when you integrate a real linphone /
+    liblinphone engine you have a documented place to load remote provisioning.
+    Fill in the <proxy> and <identity> values to match your SIP server.
+-->
+<provisioning version="2.0">
+    <!-- Remote provisioning note: this file is copied to res/raw so it can be
+         read without network access. -->
+    <proxy>
+        <domain></domain>
+        <transport></transport>
+        <port></port>
+    </proxy>
+    <identity>
+        <user></user>
+        <password></password>
+    </identity>
+    <settings>
+        <auto_register>true</auto_register>
+    </settings>
+</provisioning>

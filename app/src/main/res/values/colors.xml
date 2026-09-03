@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="primary">#2E6BE6</color>
+    <color name="primary_dark">#1E4FB0</color>
+    <color name="accent_green">#34C759</color>
+
+    <!-- Surfaces -->
+    <color name="surface_background">#F5F6F8</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1A1C1E</color>
+    <color name="text_secondary">#70747C</color>
+
+    <!-- Call screen -->
+    <color name="call_background">#191B1F</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_60">#99FFFFFF</color>
+    <color name="video_placeholder">#2A2D33</color>
+
+    <!-- Presence / status -->
+    <color name="online_green">#34C759</color>
+    <color name="offline_gray">#8A8F98</color>
+
+    <!-- Call action buttons -->
+    <color name="hangup_red">#E53935</color>
+    <color name="answer_green">#2E9E44</color>
+    <color name="decline_red">#D93025</color>
+    <color name="call_control_inactive">#3A3D44</color>
+</resources>

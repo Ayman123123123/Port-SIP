@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Port-SIP</string>
+
+    <!-- Chat list -->
+    <string name="opening_conversation">فتح المحادثة مع %1$s…</string>
+    <string name="call">اتصال</string>
+    <string name="online">متصل</string>
+    <string name="offline">غير متصل</string>
+    <string name="contact_avatar">صورة جهة الاتصال</string>
+    <string name="dialer">الاتصال</string>
+
+    <!-- Call screen -->
+    <string name="call_state_idle">جاهز</string>
+    <string name="call_state_ringing">يتصل…</string>
+    <string name="call_state_incoming">مكالمة واردة…</string>
+    <string name="call_state_connecting">جارٍ الاتصال…</string>
+    <string name="call_state_connected">المكالمة جارية</string>
+    <string name="call_state_paused">المكالمة موقوفة مؤقتاً</string>
+    <string name="call_state_ended">انتهت المكالمة</string>
+    <string name="mute">كتم الصوت</string>
+    <string name="hold">تعليق</string>
+    <string name="speaker">مكبر الصوت</string>
+    <string name="video">الفيديو</string>
+    <string name="keypad">لوحة الأرقام</string>
+    <string name="hang_up">إنهاء المكالمة</string>
+    <string name="back">رجوع</string>
+    <string name="remote_party">الطرف الآخر</string>
+    <string name="video_placeholder">فيديو تجريبي — ادمج WebRTC / liblinphone للفيديو الفعلي</string>
+
+    <!-- Incoming call -->
+    <string name="incoming_call_text">مكالمة VoIP واردة</string>
+    <string name="answer">رد</string>
+    <string name="decline">رفض</string>
+    <string name="caller">المتصل</string>
+
+    <!-- Dialer -->
+    <string name="dialer_hint">أدخل رقم الاتصال</string>
+    <string name="delete">حذف</string>
+</resources>
