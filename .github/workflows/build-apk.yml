@@ -21,6 +21,11 @@ on:
           - debug
           - release
 
+# A public repo grants GITHUB_TOKEN read-only by default; we need write so the
+# diagnostics step can commit the captured build log back for inspection.
+permissions:
+  contents: write
+
 env:
   BUILD_VARIANT: ${{ github.event.inputs.build_variant || 'debug' }}
 
