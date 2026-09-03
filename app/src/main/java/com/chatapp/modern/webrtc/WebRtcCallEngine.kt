@@ -30,7 +30,6 @@ import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSink
-import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
@@ -191,7 +190,7 @@ class WebRtcCallEngine(private val context: Context) : CallEngine, VideoProvider
         held = !held
         peerConnection?.transceivers?.forEach {
             it.direction = if (held) RtpTransceiver.RtpTransceiverDirection.SEND_ONLY
-            else RtpTransceiver.RtpTransceiverDirection.SENDRECV
+            else RtpTransceiver.RtpTransceiverDirection.SEND_RECV
         }
         publish(call.copy(state = if (held) CallState.PAUSED else CallState.CONNECTED))
     }
@@ -202,7 +201,7 @@ class WebRtcCallEngine(private val context: Context) : CallEngine, VideoProvider
         videoEnabled = !videoEnabled
         localVideoTrack?.setEnabled(videoEnabled)
         if (videoEnabled && localVideoTrack == null) startCameraCapture()
-        if (peerConnection?.signalingState == PeerConnection.SignalingState.STABLE) {
+        if (peerConnection?.signalingState() == PeerConnection.SignalingState.STABLE) {
             mainHandler.postDelayed({ renegotiateCall() }, 60)
         }
         notifyLoopback()
@@ -319,7 +318,7 @@ class WebRtcCallEngine(private val context: Context) : CallEngine, VideoProvider
 
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-            continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUOUSLY
+            continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
         }
 
         val pc = f.createPeerConnection(rtcConfig, observer) ?: return null
@@ -446,7 +445,7 @@ class WebRtcCallEngine(private val context: Context) : CallEngine, VideoProvider
 
     private fun renegotiateCall() {
         val pc = peerConnection ?: return
-        if (pc.signalingState != PeerConnection.SignalingState.STABLE) return
+        if (pc.signalingState() != PeerConnection.SignalingState.STABLE) return
         val offerObserver = object : SdpObserver {
             override fun onCreateSuccess(sdp: SessionDescription) {
                 pc.setLocalDescription(this, sdp)
@@ -575,7 +574,7 @@ class WebRtcCallEngine(private val context: Context) : CallEngine, VideoProvider
         publish(call.copy(callId = call.callId))
     }
 
-    private fun publish(call: Call) {
+    private fun publish(call: Call?) {
         _call = call
         stateObservers.forEach { it.onCallChanged(call) }
     }
