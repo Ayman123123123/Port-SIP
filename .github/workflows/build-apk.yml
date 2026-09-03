@@ -94,7 +94,9 @@ jobs:
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
             git add apk/port-sip-debug.apk
             git commit -m "Add built debug APK: ${{ github.run_id }}" || true
-            git push origin "HEAD:refs/heads/apk-output" || echo "push to apk-output failed"
+            # Force-push so the latest APK always replaces the previous one on the
+            # delivery branch, regardless of branch divergence.
+            git push -f origin "HEAD:refs/heads/apk-output" || echo "push to apk-output failed"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
