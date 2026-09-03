@@ -52,7 +52,7 @@ class CallActivity : AppCompatActivity() {
         val outgoing = intent.getBooleanExtra(EXTRA_OUTGOING, true)
         val video = intent.getBooleanExtra(EXTRA_VIDEO_ENABLED, false)
 
-        binding.remoteName.text = displayName?.ifBlank { null } ?: remoteAddress
+        binding.remoteName.text = displayName?.takeIf { it.isNotBlank() } ?: remoteAddress
         binding.remoteNumber.text = remoteAddress
         binding.callState.text = getString(R.string.call_state_connecting)
 

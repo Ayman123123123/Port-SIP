@@ -21,6 +21,9 @@ on:
           - debug
           - release
 
+env:
+  BUILD_VARIANT: ${{ github.event.inputs.build_variant || 'debug' }}
+
 jobs:
   build:
     name: Assemble APK
@@ -36,34 +39,35 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Gradle will be installed and used directly. The repo ships a full
-      # Gradle wrapper (gradlew + gradle-wrapper.jar), so we could also rely on
-      # ./gradlew, but the setup-gradle action pre-caches the distribution.
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.5'
 
-      # The Android SDK is pre-installed on ubuntu-latest, but only some
-      # platforms/build-tools are present by default. Accept licenses so AGP can
-      # auto-install the target platform (android-34) if missing.
+      # Accept licenses so AGP can auto-install the target platform/build-tools.
       - name: Accept Android SDK licenses
         run: |
           if [ -n "$ANDROID_HOME" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
             yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
           fi
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
-      - name: Build APK (${{ github.event.inputs.build_variant || 'debug' }})
+      - name: Build APK (${{ env.BUILD_VARIANT }})
         run: |
-          V="${{ github.event.inputs.build_variant || 'debug' }}"
-          gradle --no-daemon assemble"$(echo "$V" | sed 's/./\U&/')"
+          gradle --no-daemon "assemble$(echo "$BUILD_VARIANT" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')" 2>&1 | tee "$RUNNER_TEMP/build.log"
+          exit ${PIPESTATUS[0]}
 
-      - name: Upload APK
+      - name: Upload build log (always)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: port-sip-${{ github.event.inputs.build_variant || 'debug' }}-apk
-          path: |
-            app/build/outputs/apk/**/*.apk
-          if-no-files-found: error
+          name: build-log-${RUNNER_OS}-${BUILD_VARIANT}
+          path: ${{ runner.temp }}/build.log
+          if-no-files-found: warn
+
+      - name: Upload APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: port-sip-${{ env.BUILD_VARIANT }}-apk
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn
