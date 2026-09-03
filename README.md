@@ -112,13 +112,37 @@ implementation 'androidx.activity:activity-ktx:1.8.2'
 
 ## Building
 
-Requires JDK 17 and Android Studio (or a Gradle 8.5 distribution). The
-`gradle/wrapper/gradle-wrapper.jar` is **not** committed (the sandbox had no
-network access to fetch it); Android Studio will regenerate it, or run
-`gradle wrapper --gradle-version 8.5` in the project root.
+The project ships a complete Gradle wrapper (`gradlew`, `gradlew.bat`,
+`gradle-wrapper.jar`, `gradle-wrapper.properties`) pinned to Gradle 8.5 plus
+JDK 17.
 
-Then open the project in Android Studio and run the `app` configuration on an
-emulator/device.
+### Locally (recommended)
+
+1. Install **JDK 17** and open the project in **Android Studio** (Kotlin plugin).
+2. Let Gradle sync, then **Build ▸ Build App Bundle(s) / APK(s) ▸ Build APK(s)**.
+   The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
+
+Or from a terminal with JDK 17 on `PATH`:
+
+```bash
+./gradlew assembleDebug   # → app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Automatically (GitHub Actions)
+
+The repository includes `.github/workflows/build-apk.yml`, which builds on a
+GitHub-hosted runner (which has access to `dl.google.com`, `services.gradle.org`
+and `repo1.maven.org` — all blocked in a dev sandbox) and uploads the APK as a
+build artifact.
+
+1. Push to `arena/01a064bf-port-sip` (or `main`).
+2. Open the **Actions** tab → select the **Build APK** run.
+3. Download the artifact `port-sip-debug-apk` and extract `app-debug.apk`.
+4. Or trigger it manually via **Run workflow** and pick `debug` / `release`.
+
+> Note: the sandbox used to develop this project cannot resolve
+> `dl.google.com`, `services.gradle.org` or `repo1.maven.org`, so the APK is
+> built in CI rather than inside the sandbox.
 
 ---
 
