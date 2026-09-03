@@ -82,6 +82,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Commit APK to apk-output branch (delivery)
+        if: success()
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK" ]; then
+            mkdir -p apk
+            cp "$APK" apk/port-sip-debug.apk
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+            git add apk/port-sip-debug.apk
+            git commit -m "Add built debug APK: ${{ github.run_id }}" || true
+            git push origin "HEAD:refs/heads/apk-output" || echo "push to apk-output failed"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload build log (always)
         if: always()
         uses: actions/upload-artifact@v4
