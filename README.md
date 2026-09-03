@@ -140,6 +140,18 @@ build artifact.
 3. Download the artifact `port-sip-debug-apk` and extract `app-debug.apk`.
 4. Or trigger it manually via **Run workflow** and pick `debug` / `release`.
 
+The workflow additionally pushes the built APK to a dedicated **`apk-output`**
+branch, so it can be retrieved directly from git:
+
+```bash
+git fetch origin apk-output
+git checkout FETCH_HEAD -- apk/port-sip-debug.apk
+```
+
+> This project has been built successfully by the workflow (debug variant).
+> The APK is signed with the Android debug key and installable via
+> `adb install` (or drag‑and‑drop onto an emulator).
+
 > Note: the sandbox used to develop this project cannot resolve
 > `dl.google.com`, `services.gradle.org` or `repo1.maven.org`, so the APK is
 > built in CI rather than inside the sandbox.
