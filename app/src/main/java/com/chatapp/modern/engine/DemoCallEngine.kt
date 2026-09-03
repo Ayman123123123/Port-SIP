@@ -152,9 +152,10 @@ class DemoCallEngine : CallEngine {
     }
 
     private fun schedule(delayMs: Long, block: () -> Unit) {
-        handler.removeCallbacks(transitionRunnable)
-        transitionRunnable = Runnable { block() }
-        handler.postDelayed(transitionRunnable, delayMs)
+        val runnable = Runnable { block() }
+        transitionRunnable?.let { handler.removeCallbacks(it) }
+        transitionRunnable = runnable
+        handler.postDelayed(runnable, delayMs)
     }
 
     private fun trimSipScheme(address: String): String =
