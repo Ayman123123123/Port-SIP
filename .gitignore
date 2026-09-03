@@ -1,0 +1,16 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+
+# CI diagnostics (temporary)
+ci-build-log.md
+
+# Node signaling server
+server/node_modules/

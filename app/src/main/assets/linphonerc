@@ -1,0 +1,43 @@
+; ---------------------------------------------------------------------------
+; Port-SIP default Linphone configuration (linphonerc)
+; ---------------------------------------------------------------------------
+; This is a lightweight, original default configuration file provided so the
+; app has a documented place to read SIP settings. The bundled DemoCallEngine
+; does not read this file; it is consumed by a real linphone/liblinphone engine
+; when you swap CallEngineLocator.engine. Adjust the [sip] section to your own
+; proxy / account, and copy a valid account to [account_0].
+; ---------------------------------------------------------------------------
+
+[sip]
+; SIP transport: "udp", "tcp", or "tls". Keep default for demo purposes.
+transport=udp
+; Account used by the SIP stack.
+;guessed_domain=com.chatapp.modern
+
+[net]
+; Keep-alive interval for NAT (seconds).
+keepalive=20
+
+[audio]
+; Audio parameters. These are safe defaults; a real engine tunes them.
+clock_frequency=48000
+echo_cancellation=1
+
+[video]
+; Video parameters.
+size=vga
+
+[rtp]
+; Audio RTP port range.
+audio_port_range=7078-7118
+video_port_range=9078-9118
+
+[lime]
+; Legacy flag; kept for compatibility with older linphone configs.
+;enabled=0
+
+[account_0]
+; Uncomment and fill in your own SIP account to enable a real call engine.
+;reg_identity=sip:user@domain
+;reg_proxy=sip:domain;transport=udp
+;enabled=1

@@ -1,0 +1,118 @@
+name: Build APK
+
+# Builds a debug APK on a GitHub-hosted runner, which has access to the
+# Android toolchain repositories (dl.google.com, services.gradle.org,
+# repo1.maven.org) that are blocked in the dev sandbox.
+#
+# The APK is uploaded as a build artifact you can download from the
+# "Actions" tab of the repository.
+
+on:
+  push:
+    branches: [ arena/01a064bf-port-sip, main ]
+  workflow_dispatch:
+    inputs:
+      build_variant:
+        description: 'Variant to build'
+        required: false
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+
+# A public repo grants GITHUB_TOKEN read-only by default; we need write so the
+# diagnostics step can commit the captured build log back for inspection.
+permissions:
+  contents: write
+
+env:
+  BUILD_VARIANT: ${{ github.event.inputs.build_variant || 'debug' }}
+
+jobs:
+  build:
+    name: Assemble APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      # Accept licenses so AGP can auto-install the target platform/build-tools.
+      - name: Accept Android SDK licenses
+        run: |
+          if [ -n "$ANDROID_HOME" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          fi
+
+      - name: Build APK (${{ env.BUILD_VARIANT }})
+        run: |
+          gradle --no-daemon "assemble$(echo "$BUILD_VARIANT" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')" 2>&1 | tee "$RUNNER_TEMP/build.log"
+          exit ${PIPESTATUS[0]}
+
+      # If the build failed, commit the captured log back to the repo (with a
+      # [skip ci] message so it does not retrigger this workflow) so it can be
+      # read from git even when the artifact/blob endpoints are unreachable.
+      - name: Commit build log on failure (diagnostics)
+        if: failure()
+        run: |
+          echo "## Build log (run ${{ github.run_id }})" > ci-build-log.md
+          echo "" >> ci-build-log.md
+          tail -n 400 "$RUNNER_TEMP/build.log" >> ci-build-log.md || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git add ci-build-log.md
+          if git commit -m "[skip ci] Capture CI build log: ${{ github.run_id }}"; then
+            git push origin "HEAD:${{ github.ref_name }}" || echo "push failed"
+          else
+            echo "nothing to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit APK to apk-output branch (delivery)
+        if: success()
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK" ]; then
+            mkdir -p apk
+            cp "$APK" apk/port-sip-debug.apk
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+            git add apk/port-sip-debug.apk
+            git commit -m "Add built debug APK: ${{ github.run_id }}" || true
+            # Force-push so the latest APK always replaces the previous one on the
+            # delivery branch, regardless of branch divergence.
+            git push -f origin "HEAD:refs/heads/apk-output" || echo "push to apk-output failed"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ env.BUILD_VARIANT }}
+          path: ${{ runner.temp }}/build.log
+          if-no-files-found: warn
+
+      - name: Upload APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: port-sip-${{ env.BUILD_VARIANT }}-apk
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn

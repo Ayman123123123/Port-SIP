@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_background">
+
+    <!-- Top bar -->
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/primary" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/dialer"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/button_back"
+        app:layout_constraintStart_toEndOf="@id/button_back"
+        app:layout_constraintTop_toTopOf="@id/button_back" />
+
+    <!-- Number display -->
+    <TextView
+        android:id="@+id/number_display"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:minHeight="56dp"
+        android:textColor="@color/text_primary"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_back" />
+
+    <!-- Delete (clear last digit) -->
+    <ImageButton
+        android:id="@+id/action_delete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/delete"
+        android:src="@drawable/ic_backspace"
+        app:layout_constraintEnd_toEndOf="@id/number_display"
+        app:layout_constraintTop_toBottomOf="@id/number_display"
+        app:tint="@color/text_secondary" />
+
+    <!-- Keypad -->
+    <GridLayout
+        android:id="@+id/keypad"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:columnCount="3"
+        android:rowCount="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_delete">
+
+        <TextView
+            android:id="@+id/key_1"
+            style="@style/DialerKey"
+            android:text="1" />
+        <TextView
+            android:id="@+id/key_2"
+            style="@style/DialerKey"
+            android:text="2" />
+        <TextView
+            android:id="@+id/key_3"
+            style="@style/DialerKey"
+            android:text="3" />
+        <TextView
+            android:id="@+id/key_4"
+            style="@style/DialerKey"
+            android:text="4" />
+        <TextView
+            android:id="@+id/key_5"
+            style="@style/DialerKey"
+            android:text="5" />
+        <TextView
+            android:id="@+id/key_6"
+            style="@style/DialerKey"
+            android:text="6" />
+        <TextView
+            android:id="@+id/key_7"
+            style="@style/DialerKey"
+            android:text="7" />
+        <TextView
+            android:id="@+id/key_8"
+            style="@style/DialerKey"
+            android:text="8" />
+        <TextView
+            android:id="@+id/key_9"
+            style="@style/DialerKey"
+            android:text="9" />
+        <TextView
+            android:id="@+id/key_star"
+            style="@style/DialerKey"
+            android:text="*" />
+        <TextView
+            android:id="@+id/key_0"
+            style="@style/DialerKey"
+            android:text="0" />
+        <TextView
+            android:id="@+id/key_hash"
+            style="@style/DialerKey"
+            android:text="#" />
+    </GridLayout>
+
+    <!-- Call button -->
+    <ImageButton
+        android:id="@+id/action_call"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/bg_answer"
+        android:contentDescription="@string/call"
+        android:src="@drawable/ic_call"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
