@@ -1,4 +1,4 @@
-## Build log (run 33741359586)
+## Build log (run 33744180884)
 
 
 Welcome to Gradle 8.5!
@@ -22,9 +22,9 @@ Daemon will be stopped at the end of the build
 > Task :app:packageDebugResources
 > Task :app:mergeDebugResources
 > Task :app:parseDebugLocalResources
-> Task :app:mapDebugSourceSetPaths
 > Task :app:checkDebugAarMetadata
 > Task :app:dataBindingGenBaseClassesDebug
+> Task :app:mapDebugSourceSetPaths
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:processDebugMainManifest
@@ -33,18 +33,31 @@ Daemon will be stopped at the end of the build
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
-> Task :app:processDebugManifestForPackage
 > Task :app:mergeDebugAssets
+> Task :app:processDebugManifestForPackage
 > Task :app:compressDebugAssets
 > Task :app:processDebugResources
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
-> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:mergeDebugNativeLibs
 
 > Task :app:compileDebugKotlin
-e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/engine/DemoCallEngine.kt:155:33 Type mismatch: inferred type is Runnable? but Runnable was expected
-e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/engine/DemoCallEngine.kt:157:29 Smart cast to 'Runnable' is impossible, because 'transitionRunnable' is a mutable property that could have been changed by this time
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/ui/settings/SettingsActivity.kt:41:37 Unresolved reference: useWebRtc
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/ui/settings/SettingsActivity.kt:62:17 Unresolved reference: useWebRtc
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/ui/settings/SettingsActivity.kt:62:27 Variable expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:160:17 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:166:17 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:194:57 Unresolved reference: SENDRECV
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:205:29 Function invocation 'signalingState()' expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:322:80 Unresolved reference: GATHER_CONTINUOUSLY
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:386:66 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:400:17 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:436:33 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:449:16 Function invocation 'signalingState()' expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:486:25 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:495:71 Type mismatch: inferred type is Call? but Call was expected
+e: file:///home/runner/work/Port-SIP/Port-SIP/app/src/main/java/com/chatapp/modern/webrtc/WebRtcCallEngine.kt:586:21 Type mismatch: inferred type is Call? but Call was expected
 
 > Task :app:compileDebugKotlin FAILED
 > Task :app:mergeExtDexDebug
@@ -62,5 +75,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 1m 24s
-24 actionable tasks: 24 executed
+BUILD FAILED in 1m 32s
+25 actionable tasks: 25 executed
