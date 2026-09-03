@@ -56,11 +56,32 @@ jobs:
           gradle --no-daemon "assemble$(echo "$BUILD_VARIANT" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')" 2>&1 | tee "$RUNNER_TEMP/build.log"
           exit ${PIPESTATUS[0]}
 
+      # If the build failed, commit the captured log back to the repo (with a
+      # [skip ci] message so it does not retrigger this workflow) so it can be
+      # read from git even when the artifact/blob endpoints are unreachable.
+      - name: Commit build log on failure (diagnostics)
+        if: failure()
+        run: |
+          echo "## Build log (run ${{ github.run_id }})" > ci-build-log.md
+          echo "" >> ci-build-log.md
+          tail -n 400 "$RUNNER_TEMP/build.log" >> ci-build-log.md || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git add ci-build-log.md
+          if git commit -m "[skip ci] Capture CI build log: ${{ github.run_id }}"; then
+            git push origin "HEAD:${{ github.ref_name }}" || echo "push failed"
+          else
+            echo "nothing to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload build log (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-log-${RUNNER_OS}-${BUILD_VARIANT}
+          name: build-log-${{ env.BUILD_VARIANT }}
           path: ${{ runner.temp }}/build.log
           if-no-files-found: warn
 
