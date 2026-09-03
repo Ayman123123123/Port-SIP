@@ -11,3 +11,6 @@
 
 # CI diagnostics (temporary)
 ci-build-log.md
+
+# Node signaling server
+server/node_modules/

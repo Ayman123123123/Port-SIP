@@ -12,6 +12,7 @@ import com.chatapp.modern.databinding.FragmentChatsBinding
 import com.chatapp.modern.model.Contact
 import com.chatapp.modern.ui.call.CallActivity
 import com.chatapp.modern.ui.dialer.DialerActivity
+import com.chatapp.modern.ui.settings.SettingsActivity
 
 /**
  * Chat/conversation list. This is the integration point: tapping the call icon on
@@ -47,6 +48,11 @@ class ChatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.chatListRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.chatListRecycler.adapter = adapter
+
+        // Toolbar settings icon opens the WebRTC configuration screen.
+        binding.toolbar.setNavigationOnClickListener {
+            startActivity(Intent(requireContext(), SettingsActivity::class.java))
+        }
 
         // FAB opens the Dialer (phone pad) so the user can dial any number.
         binding.fabDialer.setOnClickListener {

@@ -1,0 +1,14 @@
+{
+  "name": "port-sip-signaling",
+  "version": "1.0.0",
+  "description": "Minimal WebSocket signaling server for Port-SIP WebRTC calls.",
+  "main": "signaling-server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node signaling-server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT"
+}

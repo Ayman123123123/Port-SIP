@@ -36,6 +36,13 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    // WebRTC ships native .so per ABI; keep default packaging.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
 }
 
 dependencies {
@@ -48,6 +55,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
     implementation 'androidx.activity:activity-ktx:1.8.2'
+
+    // Real-time media (audio + video): WebRTC by Google, BSD-3-Clause.
+    implementation 'io.github.webrtc-sdk:android:125.6422.07'
+
+    // WebSocket signaling client for the call engine.
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

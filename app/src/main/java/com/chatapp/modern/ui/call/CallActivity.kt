@@ -1,21 +1,28 @@
 package com.chatapp.modern.ui.call
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.chatapp.modern.R
 import com.chatapp.modern.databinding.ActivityCallBinding
 import com.chatapp.modern.engine.Call
 import com.chatapp.modern.engine.CallEngineLocator
 import com.chatapp.modern.engine.CallState
 import com.chatapp.modern.engine.CallStateObserver
+import com.chatapp.modern.webrtc.VideoProvider
+import org.webrtc.EglBase
 
 /**
  * Active call screen: shows the remote party, call state and the standard in-call
  * controls (mute, hold, speaker, DTMF keypad, video, hang up).
  *
- * This is the screen the [com.chatapp.modern.ui.chat.ChatsFragment] launches when a
- * call is initiated from a conversation.
+ * Launched by [com.chatapp.modern.ui.chat.ChatsFragment] when a call is initiated
+ * from a conversation. If the active engine is a [VideoProvider] (WebRTC), local
+ * and remote video renderers are attached and live video is shown.
  */
 class CallActivity : AppCompatActivity() {
 
@@ -29,8 +36,12 @@ class CallActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCallBinding
     private val engine get() = CallEngineLocator.engine
 
-    // Only finish when a call that was displayed actually ends (transitions to
-    // null); a null at registration time (fresh outgoing call) must not close us.
+    private var eglBase: EglBase? = null
+    private var requestedOutgoing = false
+    private var requestedAddress = ""
+    private var requestedName: String? = null
+    private var requestedVideo = false
+
     private var hasRenderedCall = false
 
     private val observer = CallStateObserver { call ->
@@ -42,29 +53,75 @@ class CallActivity : AppCompatActivity() {
         }
     }
 
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            startCallIfReady()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val remoteAddress = intent.getStringExtra(EXTRA_REMOTE_ADDRESS).orEmpty()
-        val displayName = intent.getStringExtra(EXTRA_DISPLAY_NAME)
-        val outgoing = intent.getBooleanExtra(EXTRA_OUTGOING, true)
-        val video = intent.getBooleanExtra(EXTRA_VIDEO_ENABLED, false)
+        requestedAddress = intent.getStringExtra(EXTRA_REMOTE_ADDRESS).orEmpty()
+        requestedName = intent.getStringExtra(EXTRA_DISPLAY_NAME)
+        requestedOutgoing = intent.getBooleanExtra(EXTRA_OUTGOING, true)
+        requestedVideo = intent.getBooleanExtra(EXTRA_VIDEO_ENABLED, false)
 
-        binding.remoteName.text = displayName?.takeIf { it.isNotBlank() } ?: remoteAddress
-        binding.remoteNumber.text = remoteAddress
+        binding.remoteName.text = requestedName?.takeIf { it.isNotBlank() } ?: requestedAddress
+        binding.remoteNumber.text = requestedAddress
         binding.callState.text = getString(R.string.call_state_connecting)
+
+        initVideoIfAvailable()
 
         engine.addStateObserver(observer)
 
-        if (outgoing) {
-            engine.startOutgoingCall(remoteAddress, displayName, video)
+        if (requiresPermissions()) {
+            requestPermissions()
+        } else {
+            startCallIfReady()
         }
-        // For the incoming-then-accepted path the engine already carries the call;
-        // the observer above will render it.
 
         wireControls()
+    }
+
+    private fun requiresPermissions(): Boolean {
+        val mic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+        val cam = requestedVideo &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+        return mic != PackageManager.PERMISSION_GRANTED || cam
+    }
+
+    private fun requestPermissions() {
+        val wanted = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            wanted += Manifest.permission.RECORD_AUDIO
+        }
+        if (requestedVideo &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            wanted += Manifest.permission.CAMERA
+        }
+        permissionLauncher.launch(wanted.toTypedArray())
+    }
+
+    private fun startCallIfReady() {
+        if (requestedOutgoing) {
+            engine.startOutgoingCall(requestedAddress, requestedName, requestedVideo)
+        }
+        // Incoming path: the engine already carries the call (WebRTC) or it's demo.
+        val current = engine.currentCall
+        if (current != null) render(current)
+    }
+
+    private fun initVideoIfAvailable() {
+        val provider = engine as? VideoProvider ?: return
+        eglBase = EglBase.create()
+        val ctx = eglBase!!.eglBaseContext
+        binding.remoteVideoRenderer.init(ctx, null)
+        binding.localVideoRenderer.init(ctx, null)
+        binding.localVideoRenderer.setMirror(true)
+        provider.attachRemoteSink(binding.remoteVideoRenderer)
+        provider.attachLocalSink(binding.localVideoRenderer)
     }
 
     private fun render(call: Call) {
@@ -86,7 +143,14 @@ class CallActivity : AppCompatActivity() {
         binding.buttonSpeaker.isSelected = engine.isSpeakerEnabled()
         binding.buttonVideo.isSelected = engine.isVideoEnabled()
 
-        binding.videoSurface.visibility = if (engine.isVideoEnabled()) View.VISIBLE else View.GONE
+        updateVideoVisibility()
+    }
+
+    private fun updateVideoVisibility() {
+        val isVideoProvider = engine is VideoProvider
+        val show = isVideoProvider && engine.isVideoEnabled()
+        binding.videoSurface.visibility = if (show) View.VISIBLE else View.GONE
+        binding.videoHint.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     private fun wireControls() {
@@ -107,7 +171,7 @@ class CallActivity : AppCompatActivity() {
         binding.buttonVideo.setOnClickListener {
             engine.toggleVideo()
             binding.buttonVideo.isSelected = engine.isVideoEnabled()
-            binding.videoSurface.visibility = if (engine.isVideoEnabled()) View.VISIBLE else View.GONE
+            updateVideoVisibility()
         }
 
         binding.buttonHangup.setOnClickListener {
@@ -139,6 +203,13 @@ class CallActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         engine.removeStateObserver(observer)
+        (engine as? VideoProvider)?.detachSinks()
+        if (::binding.isInitialized) {
+            binding.remoteVideoRenderer.release()
+            binding.localVideoRenderer.release()
+        }
+        eglBase?.release()
+        eglBase = null
         super.onDestroy()
     }
 }

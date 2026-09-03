@@ -60,10 +60,39 @@ fun interface CallStateObserver {
 /**
  * Supplies the active [CallEngine] so that screens can be wired against one
  * implementation and the implementation can be swapped later in one place.
+ *
+ * On [init] (and on [refresh]) it resolves the engine from the persisted
+ * [com.chatapp.modern.webrtc.WebRtcConfig]: a real
+ * [com.chatapp.modern.webrtc.WebRtcCallEngine] when the user has enabled and
+ * configured WebRTC, otherwise the bundled [DemoCallEngine].
  */
 object CallEngineLocator {
     @Volatile
     var engine: CallEngine = DemoCallEngine()
+        private set
+
+    @Volatile
+    private var appContext: android.content.Context? = null
+
+    fun init(context: android.content.Context) {
+        appContext = context.applicationContext
+        engine = resolveEngine()
+    }
+
+    /** Re-read configuration (call after the user edits settings). */
+    fun refresh() {
+        engine = resolveEngine()
+    }
+
+    private fun resolveEngine(): CallEngine {
+        val ctx = appContext ?: return DemoCallEngine()
+        val cfg = com.chatapp.modern.webrtc.WebRtcConfig.load(ctx)
+        return if (cfg.useWebRtc && cfg.signalingServerUrl.isNotBlank()) {
+            com.chatapp.modern.webrtc.WebRtcCallEngine(ctx)
+        } else {
+            DemoCallEngine()
+        }
+    }
 }
 
 internal fun newCallId(): String = UUID.randomUUID().toString()

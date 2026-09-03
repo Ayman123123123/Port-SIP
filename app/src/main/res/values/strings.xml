@@ -37,4 +37,17 @@
     <!-- Dialer -->
     <string name="dialer_hint">أدخل رقم الاتصال</string>
     <string name="delete">حذف</string>
+
+    <!-- Settings -->
+    <string name="settings">الإعدادات</string>
+    <string name="settings_use_webrtc">تفعيل WebRTC (مكالمات حقيقية)</string>
+    <string name="settings_signaling_server">خادم الإشارات (ws:// أو wss://)</string>
+    <string name="settings_username">اسم المستخدم (المعرّف)</string>
+    <string name="settings_stun">خادم STUN</string>
+    <string name="settings_turn_url">خادم TURN (اختياري)</string>
+    <string name="settings_turn_username">اسم مستخدم TURN</string>
+    <string name="settings_turn_password">كلمة مرور TURN</string>
+    <string name="settings_save">حفظ</string>
+    <string name="settings_saved">تم حفظ الإعدادات</string>
+    <string name="settings_help">لمكالمات حقيقية: ضع عنوان خادم الإشارات المرفق (server/) واسم المستخدم، ثم فعّل WebRTC. ستُستخدم STUN/TURN للاتصالات عبر الشبكات.</string>
 </resources>

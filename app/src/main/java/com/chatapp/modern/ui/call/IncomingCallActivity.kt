@@ -16,6 +16,20 @@ import com.chatapp.modern.engine.CallStateObserver
  */
 class IncomingCallActivity : AppCompatActivity() {
 
+    companion object {
+        @Volatile private var screenOpen = false
+        @Volatile private var pendingLaunch = false
+
+        fun isOpen(): Boolean = screenOpen
+        fun isPendingLaunch(): Boolean = pendingLaunch
+        fun markPendingLaunch() {
+            pendingLaunch = true
+        }
+        fun clearPendingLaunch() {
+            pendingLaunch = false
+        }
+    }
+
     private lateinit var binding: ActivityIncomingCallBinding
     private val engine get() = CallEngineLocator.engine
 
@@ -31,6 +45,8 @@ class IncomingCallActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        clearPendingLaunch()
+        screenOpen = true
         binding = ActivityIncomingCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -71,6 +87,7 @@ class IncomingCallActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        screenOpen = false
         engine.removeStateObserver(observer)
         super.onDestroy()
     }
